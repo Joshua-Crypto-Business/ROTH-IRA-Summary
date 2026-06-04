@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Roth IRA Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/iconfont/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0d0d;
+    color: #f5f5f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px 12px 40px;
+  }
+  h1 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; margin-bottom: 4px; }
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #777; margin: 20px 0 8px; }
+
+  /* Aggregate Header */
+  .agg-header {
+    background: #111;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    margin-bottom: 4px;
+  }
+  .agg-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #777; margin-bottom: 6px; }
+  .agg-value { font-size: 29px; font-weight: 600; letter-spacing: -0.5px; color: #fff; }
+  .agg-meta { display: flex; gap: 16px; margin-top: 6px; font-size: 12px; color: #aaa; }
+  .agg-meta span.up { color: #21ce99; }
+  .agg-meta span.dn { color: #ff5000; }
+  .ira2-note { font-size: 11px; color: #666; margin-top: 4px; }
+
+  /* Account Section */
+  .account-block {
+    background: #111;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    margin-bottom: 12px;
+  }
+  .account-block.muted { opacity: 0.45; }
+  .account-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .account-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; }
+  .account-value { font-size: 22px; font-weight: 600; color: #ffffff; margin-top: 2px; }
+  .account-pnl { font-size: 12px; margin-top: 2px; }
+  .account-cash { font-size: 11px; color: #888; margin-top: 3px; }
+
+  /* Button Row */
+  .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .btn {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    background: #1a1a1a;
+    color: #bbb;
+    text-align: center;
+  }
+  .btn.green { background: #21ce99; color: #000; border-color: #21ce99; font-weight: 600; }
+  .btn:active { opacity: 0.7; }
+
+  /* Holdings Table */
+  .holdings { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .holdings th {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: #888; padding: 4px 4px 6px; text-align: right; border-bottom: 0.5px solid #222;
+  }
+  .holdings th:first-child { text-align: left; }
+  .holdings td { padding: 6px 4px; vertical-align: top; border-bottom: 0.5px solid #1a1a1a; }
+  .holdings tr:last-child td { border-bottom: none; }
+  .ticker { font-weight: 600; font-size: 14px; color: #ffffff; }
+  .shares-cost { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .ma-line { font-size: 11px; margin-top: 4px; line-height: 1.8; color: #B3A000; }
+  .td-right { text-align: right; }
+  .price-val { font-size: 13px; color: #f0f0f0; }
+  .value-val { font-size: 13px; color: #f0f0f0; }
+  .pnl-pos { color: #21ce99; font-size: 12px; }
+  .pnl-neg { color: #ff5000; font-size: 12px; }
+  .pnl-pct { font-size: 11px; opacity: 0.9; }
+  .edit-btn { background: none; border: none; color: #555; cursor: pointer; font-size: 12px; padding: 0 2px; }
+  .edit-btn:hover { color: #888; }
+  .price-input {
+    width: 66px; background: #1a1a1a; border: 0.5px solid #21ce99;
+    color: #fff; border-radius: 4px; padding: 2px 4px; font-size: 12px; text-align: right;
+  }
+  .loading-dot { color: #555; font-size: 12px; }
+
+  /* Pie Chart */
+  .pie-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 8px; }
+  canvas { display: block; }
+  .pie-legend { display: flex; flex-wrap: wrap; gap: 2px 0; margin-top: 12px; justify-content: flex-start; width: 100%; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #aaa; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Roth IRA 2 Placeholder */
+  .ira2-placeholder {
+    text-align: center; padding: 24px 14px; color: #666; font-size: 12px; line-height: 1.6;
+  }
+  .ira2-placeholder .ira2-title { font-size: 13px; color: #555; font-weight: 600; margin-bottom: 6px; }
+
+  /* Footer */
+  .footer { text-align: center; font-size: 11px; color: #555; margin-top: 20px; }
+  .download-link { display: block; text-align: center; font-size: 11px; color: #444; margin-top: 12px; cursor: pointer; text-decoration: none; }
+  .download-link:hover { color: #777; }
+
+  .up { color: #21ce99; }
+  .dn { color: #ff5000; }
+  .neutral { color: #777; }
+</style>
+</head>
+<body>
+
+<a href="index.html" style="display:inline-block;font-size:11px;color:#555;text-decoration:none;margin-bottom:12px;">← Back</a>
+<div class="agg-label" style="margin-bottom:8px;">TOTAL PORTFOLIO</div>
+<div class="agg-header">
+  <div class="agg-value" id="agg-total">—</div>
+  <div class="agg-meta">
+    <span id="agg-basis">Basis: —</span>
+    <span id="agg-pnl" class="neutral">P&L: —</span>
+  </div>
+</div>
+
+<!-- ROTH IRA 1 -->
+<div class="section-label">Roth IRA 1 — Robinhood</div>
+<div class="account-block">
+  <div class="account-header">
+    <div>
+      <div class="account-name">Roth IRA 1</div>
+      <div class="account-value" id="ira1-total">—</div>
+      <div class="account-pnl" id="ira1-pnl">—</div>
+      <div class="account-cash" id="ira1-cash">Cash: —</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <div class="btn" onclick="runDiagnostic()"><i class="ti ti-chart-bar"></i> Run Diagnostic ↗</div>
+    <div class="btn green" id="refresh-btn1" onclick="fetchAll()"><i class="ti ti-refresh"></i> Refresh</div>
+  </div>
+
+  <table class="holdings">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th class="td-right">Price</th>
+        <th class="td-right">Value</th>
+        <th class="td-right">P&L</th>
+        <th class="td-right"></th>
+      </tr>
+    </thead>
+    <tbody id="holdings-body"></tbody>
+  </table>
+
+  <div class="pie-wrap">
+    <canvas id="pie1" width="220" height="220"></canvas>
+    <div class="pie-legend" id="pie1-legend"></div>
+  </div>
+</div>
+
+<!-- ROTH IRA 2 -->
+<div class="section-label">Roth IRA 2 — Robinhood</div>
+<div class="account-block">
+  <div class="account-header">
+    <div>
+      <div class="account-name">Roth IRA 2</div>
+      <div class="account-value" id="ira2-total">—</div>
+      <div class="account-pnl" id="ira2-pnl">—</div>
+      <div class="account-cash" id="ira2-cash">Cash: $593.84</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <div class="btn" onclick="runDiagnostic2()"><i class="ti ti-chart-bar"></i> Run Diagnostic ↗</div>
+    <div class="btn green" id="refresh-btn2" onclick="fetchAll2()"><i class="ti ti-refresh"></i> Refresh</div>
+  </div>
+  <table class="holdings">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th class="td-right">Price</th>
+        <th class="td-right">Value</th>
+        <th class="td-right">P&L</th>
+        <th class="td-right"></th>
+      </tr>
+    </thead>
+    <tbody id="holdings-body2"></tbody>
+  </table>
+  <div class="pie-wrap">
+    <canvas id="pie2" width="220" height="220"></canvas>
+    <div class="pie-legend" id="pie2-legend"></div>
+  </div>
+</div>
+
+<a class="download-link" onclick="downloadHTML()">⬇ Download HTML</a>
+<div class="footer" id="last-updated">—</div>
+
+<script>
+const FINNHUB_KEY = "d832a8hr01ql4ong0df0d832a8hr01ql4ong0dfg";
+const BASE = "https://finnhub.io/api/v1/quote";
+const STORAGE_KEY1 = "rh_ira1_positions";
+const STORAGE_KEY2 = "rh_ira2_positions";
+const IRA1_COST_BASIS = 7200;
+const IRA2_CASH = 593.84;
+
+const PIE_COLORS = ['#21ce99','#4a9eff','#ff5000','#f1c40f','#9b59b6','#e67e22','#1abc9c','#e74c3c','#3498db','#2ecc71','#e91e8c','#00bcd4','#ff9800','#8bc34a','#ff4081'];
+
+const MA_KEY1 = "rh_ira1_mas";
+const MA_KEY2 = "rh_ira2_mas";
+const INDICATOR_BASE = "https://finnhub.io/api/v1/stock/indicator";
+
+// MA cache: { TICKER: { ma50, ma100, ma200 } }
+let maCache1 = {};
+let maCache2 = {};
+
+async function fetchMA(ticker, period) {
+  try {
+    const now = Math.floor(Date.now() / 1000);
+    const from = now - (period + 60) * 24 * 60 * 60;
+    const url = `${INDICATOR_BASE}?symbol=${ticker}&resolution=D&from=${from}&to=${now}&indicator=sma&timeperiod=${period}&token=${FINNHUB_KEY}`;
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d && d.sma && d.sma.length > 0) {
+      const val = d.sma[d.sma.length - 1];
+      return isNaN(val) ? null : val;
+    }
+    return null;
+  } catch(e) { return null; }
+}
+
+async function fetchAllMAs(positions, cache) {
+  for (let i = 0; i < positions.length; i++) {
+    const t = positions[i].ticker;
+    const [ma50, ma100, ma200] = await Promise.all([
+      fetchMA(t, 50),
+      fetchMA(t, 100),
+      fetchMA(t, 200),
+    ]);
+    cache[t] = { ma50, ma100, ma200 };
+    await new Promise(r => setTimeout(r, 300));
+  }
+}
+
+async function saveMAs(key, cache) {
+  try { if (window.storage) await window.storage.set(key, JSON.stringify(cache)); } catch(e) {}
+  try { localStorage.setItem(key, JSON.stringify(cache)); } catch(e) {}
+}
+
+async function loadMAs(key) {
+  try {
+    if (window.storage) {
+      const r = await window.storage.get(key);
+      if (r && r.value) return JSON.parse(r.value);
+    }
+  } catch(e) {}
+  try {
+    const ls = localStorage.getItem(key);
+    if (ls) return JSON.parse(ls);
+  } catch(e) {}
+  return {};
+}
+
+function fmtMA(label, val, price) {
+  if (!val) return `<span style="color:#555">${label}: —</span>`;
+  const above = price && price > val;
+  const arrow = above ? '▲' : '▼';
+  const color = above ? '#21ce99' : '#ff5000';
+  return `<span style="color:#B3A000;font-weight:600">${label}</span> <span style="color:#B3A000">${arrow} $${val.toFixed(2)}</span>`;
+}
+
+let positions1 = [
+  { ticker:'COST', shares:0.49432,    cost:1011.49,  price:null },
+  { ticker:'DVN',  shares:21.419575,  cost:46.69,    price:null },
+  { ticker:'ENTG', shares:3.338563,   cost:149.77,   price:null },
+  { ticker:'HIVE', shares:75.301204,  cost:3.32,     price:null },
+  { ticker:'IREN', shares:19.675356,  cost:50.83,    price:null },
+  { ticker:'MRVL', shares:5.883737,   cost:169.96,   price:null },
+  { ticker:'NOW',  shares:11.17693,   cost:89.47,    price:null },
+  { ticker:'RBLX', shares:5.929791,   cost:42.16,    price:null },
+  { ticker:'SHAZ', shares:4.06285,    cost:56.01,    price:null },
+  { ticker:'SNDK', shares:0.666927,   cost:1472.60,  price:null },
+  { ticker:'TE',   shares:75.681893,  cost:6.61,     price:null },
+];
+
+let positions2 = [
+  { ticker:'BKKT', shares:105.10,      cost:10.10,   price:null },
+  { ticker:'TE',   shares:60.11378,    cost:10.27,   price:null },
+  { ticker:'QBTS', shares:20.560603,   cost:28.36,   price:null },
+  { ticker:'OPEN', shares:113.0066,    cost:4.82,    price:null },
+  { ticker:'NVO',  shares:12.526705,   cost:45.75,   price:null },
+  { ticker:'IREN', shares:8.073631,    cost:61.93,   price:null },
+  { ticker:'LAC',  shares:86.811584,   cost:5.76,    price:null },
+  { ticker:'DRAM', shares:4.863238,    cost:62.92,   price:null },
+  { ticker:'SMR',  shares:26.45536,    cost:12.54,   price:null },
+  { ticker:'HLIT', shares:21.568764,   cost:16.49,   price:null },
+  { ticker:'CIFR', shares:10.624734,   cost:23.53,   price:null },
+  { ticker:'ENPH', shares:3.732457,    cost:66.98,   price:null },
+  { ticker:'ELMT', shares:12.639029,   cost:19.78,   price:null },
+  { ticker:'NRG',  shares:1.889073,    cost:132.34,  price:null },
+  { ticker:'ONDS', shares:7.701193,    cost:12.99,   price:null },
+];
+
+// Storage helpers
+async function save(key, data) {
+  const payload = { pos: data, ts: Date.now() };
+  try { if (window.storage) await window.storage.set(key, JSON.stringify(payload)); } catch(e) {}
+  try { localStorage.setItem(key, JSON.stringify(payload)); } catch(e) {}
+}
+
+async function load(key, fallback) {
+  try {
+    if (window.storage) {
+      const r = await window.storage.get(key);
+      if (r && r.value) { const d = JSON.parse(r.value); if (d.pos) return d.pos; }
+    }
+  } catch(e) {}
+  try {
+    const ls = localStorage.getItem(key);
+    if (ls) { const d = JSON.parse(ls); if (d.pos) return d.pos; }
+  } catch(e) {}
+  return fallback;
+}
+
+// Fetch single price
+async function fetchPrice(ticker) {
+  try {
+    const r = await fetch(`${BASE}?symbol=${ticker}&token=${FINNHUB_KEY}`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.c || null;
+  } catch(e) { return null; }
+}
+
+// Fetch all IRA1
+async function fetchAll() {
+  const btn = document.getElementById('refresh-btn1');
+  if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
+  try {
+    for (let i = 0; i < positions1.length; i++) {
+      const p = await fetchPrice(positions1[i].ticker);
+      if (p !== null) positions1[i].price = p;
+      if (i < positions1.length - 1) await new Promise(r => setTimeout(r, 120));
+    }
+    await save(STORAGE_KEY1, positions1);
+    await fetchAllMAs(positions1, maCache1);
+    await saveMAs(MA_KEY1, maCache1);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('last-updated').textContent = 'IRA 1 refresh failed — check network';
+  } finally {
+    renderAll();
+    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
+  }
+}
+
+// Fetch all IRA2
+async function fetchAll2() {
+  const btn = document.getElementById('refresh-btn2');
+  if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
+  try {
+    for (let i = 0; i < positions2.length; i++) {
+      const p = await fetchPrice(positions2[i].ticker);
+      if (p !== null) positions2[i].price = p;
+      if (i < positions2.length - 1) await new Promise(r => setTimeout(r, 120));
+    }
+    await save(STORAGE_KEY2, positions2);
+    await fetchAllMAs(positions2, maCache2);
+    await saveMAs(MA_KEY2, maCache2);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('last-updated').textContent = 'IRA 2 refresh failed — check network';
+  } finally {
+    renderAll();
+    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
+  }
+}
+
+function fmt(n) { return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function renderTable(positions, tbodyId, editFn, maCache) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+  let totalVal = 0, totalBasis = 0;
+
+  positions.forEach((p, i) => {
+    const price = p.price;
+    const val = price ? price * p.shares : null;
+    const basis = p.cost * p.shares;
+    const pnlAmt = val !== null ? val - basis : null;
+    const pnlPct = pnlAmt !== null ? (pnlAmt / basis) * 100 : null;
+    if (val) totalVal += val;
+    totalBasis += basis;
+
+    const mas = (maCache && maCache[p.ticker]) || {};
+    const maLine = [
+      fmtMA('50d', mas.ma50, price),
+      fmtMA('100d', mas.ma100, price),
+      fmtMA('200d', mas.ma200, price),
+    ].join(' &nbsp;·&nbsp; ');
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="ticker">${p.ticker}</div>
+        <div class="shares-cost">${p.shares.toFixed(4)} sh · $${p.cost.toFixed(2)} avg</div>
+        <div class="ma-line">${maLine}</div>
+      </td>
+      <td class="td-right">
+        <div class="price-val" id="${tbodyId}-price-${p.ticker}">
+          ${price ? fmt(price) : '<span class="loading-dot">—</span>'}
+        </div>
+      </td>
+      <td class="td-right">
+        <div class="value-val">${val ? fmt(val) : '—'}</div>
+      </td>
+      <td class="td-right">
+        ${pnlAmt !== null
+          ? `<div class="${pnlAmt >= 0 ? 'pnl-pos' : 'pnl-neg'}">${pnlAmt >= 0 ? '+' : ''}${fmt(Math.abs(pnlAmt))}</div>
+             <div class="pnl-pct ${pnlAmt >= 0 ? 'pnl-pos' : 'pnl-neg'}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</div>`
+          : '<span class="neutral">—</span>'}
+      </td>
+      <td class="td-right">
+        <button class="edit-btn" onclick="${editFn}(${i})" title="Edit price">✏️</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  return { totalVal, totalBasis };
+}
+
+function renderAll() {
+  // IRA1
+  const r1 = renderTable(positions1, 'holdings-body', 'editPrice1', maCache1);
+  const ira1Val = r1.totalVal, ira1Basis = r1.totalBasis;
+  document.getElementById('ira1-total').textContent = ira1Val ? fmt(ira1Val) : '—';
+  document.getElementById('ira1-cash').textContent = 'Cash: $0.00';
+  const p1pnl = ira1Val - ira1Basis;
+  const p1pct = (p1pnl / ira1Basis) * 100;
+  const ira1El = document.getElementById('ira1-pnl');
+  if (ira1Val) {
+    ira1El.textContent = `vs basis ${p1pnl >= 0 ? '+' : ''}${fmt(Math.abs(p1pnl))} (${p1pct >= 0 ? '+' : ''}${p1pct.toFixed(1)}%)`;
+    ira1El.className = 'account-pnl ' + (p1pnl >= 0 ? 'up' : 'dn');
+  }
+
+  // IRA2
+  const r2 = renderTable(positions2, 'holdings-body2', 'editPrice2', maCache2);
+  const ira2Val = r2.totalVal + IRA2_CASH, ira2Basis = r2.totalBasis;
+  document.getElementById('ira2-total').textContent = ira2Val ? fmt(ira2Val) : '—';
+  document.getElementById('ira2-cash').textContent = `Cash: ${fmt(IRA2_CASH)}`;
+  const p2pnl = ira2Val - ira2Basis - IRA2_CASH;
+  const p2pct = ira2Basis > 0 ? (p2pnl / ira2Basis) * 100 : 0;
+  const ira2El = document.getElementById('ira2-pnl');
+  if (r2.totalVal) {
+    ira2El.textContent = `vs basis ${p2pnl >= 0 ? '+' : ''}${fmt(Math.abs(p2pnl))} (${p2pct >= 0 ? '+' : ''}${p2pct.toFixed(1)}%) · Cash ${fmt(IRA2_CASH)}`;
+    ira2El.className = 'account-pnl ' + (p2pnl >= 0 ? 'up' : 'dn');
+  }
+
+  // Aggregate
+  const combinedVal = (ira1Val || 0) + (ira2Val || 0);
+  const combinedBasis = IRA1_COST_BASIS + ira2Basis + IRA2_CASH;
+  const aggPnl = combinedVal - combinedBasis;
+  const aggPct = (aggPnl / combinedBasis) * 100;
+  document.getElementById('agg-total').textContent = combinedVal ? fmt(combinedVal) : '—';
+  document.getElementById('agg-basis').textContent = `Basis: ${fmt(combinedBasis)}`;
+  const aggEl = document.getElementById('agg-pnl');
+  if (combinedVal) {
+    aggEl.textContent = `P&L: ${aggPnl >= 0 ? '+' : ''}${fmt(Math.abs(aggPnl))} (${aggPct >= 0 ? '+' : ''}${aggPct.toFixed(1)}%)`;
+    aggEl.className = aggPnl >= 0 ? 'up' : 'dn';
+  }
+
+  drawPie('pie1', 'pie1-legend', positions1);
+  drawPie('pie2', 'pie2-legend', positions2);
+}
+
+// Inline edit IRA1
+function editPrice1(i) {
+  const el = document.getElementById('holdings-body-price-' + positions1[i].ticker);
+  if (!el) return;
+  const cur = positions1[i].price || '';
+  el.innerHTML = `<input class="price-input" id="ei1-${i}" type="number" value="${cur}" step="0.01">`;
+  const input = document.getElementById('ei1-' + i);
+  input.focus(); input.select();
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const v = parseFloat(input.value);
+      if (!isNaN(v) && v > 0) { positions1[i].price = v; await save(STORAGE_KEY1, positions1); renderAll(); }
+    }
+    if (e.key === 'Escape') renderAll();
+  });
+}
+
+// Inline edit IRA2
+function editPrice2(i) {
+  const el = document.getElementById('holdings-body2-price-' + positions2[i].ticker);
+  if (!el) return;
+  const cur = positions2[i].price || '';
+  el.innerHTML = `<input class="price-input" id="ei2-${i}" type="number" value="${cur}" step="0.01">`;
+  const input = document.getElementById('ei2-' + i);
+  input.focus(); input.select();
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const v = parseFloat(input.value);
+      if (!isNaN(v) && v > 0) { positions2[i].price = v; await save(STORAGE_KEY2, positions2); renderAll(); }
+    }
+    if (e.key === 'Escape') renderAll();
+  });
+}
+
+// Sector map
+const SECTORS = {
+  COST: 'Consumer Staples',
+  DVN:  'Energy',
+  ENTG: 'Semiconductors',
+  HIVE: 'Crypto Mining / AI Infra',
+  IREN: 'Crypto Mining / AI Infra',
+  MRVL: 'Semiconductors',
+  NOW:  'Enterprise Software',
+  RBLX: 'Gaming',
+  SHAZ: 'AI Infrastructure',
+  SNDK: 'Semiconductors',
+  TE:   'Electronic Components',
+  BKKT: 'Crypto Infra / Stablecoins',
+  QBTS: 'Quantum Computing',
+  OPEN: 'Real Estate Tech',
+  NVO:  'Pharma / Healthcare',
+  LAC:  'Lithium / Materials',
+  DRAM: 'Semiconductors',
+  SMR:  'Nuclear Energy',
+  HLIT: 'Video Infrastructure',
+  CIFR: 'Crypto Mining / AI Infra',
+  ENPH: 'Clean Energy',
+  ELMT: 'Aerospace & Defense',
+  NRG:  'Energy',
+  ONDS: 'Autonomous Drones',
+};
+
+const SECTOR_COLORS = {
+  'Semiconductors':           '#4a9eff',
+  'Crypto Mining / AI Infra': '#f1c40f',
+  'Crypto Infra / Stablecoins':'#e67e22',
+  'Energy':                   '#e74c3c',
+  'Consumer Staples':         '#21ce99',
+  'Enterprise Software':      '#9b59b6',
+  'Gaming':                   '#1abc9c',
+  'AI Infrastructure':        '#00bcd4',
+  'Electronic Components':    '#3498db',
+  'Quantum Computing':        '#ff4081',
+  'Real Estate Tech':         '#8bc34a',
+  'Pharma / Healthcare':      '#26c6da',
+  'Lithium / Materials':      '#ff9800',
+  'Nuclear Energy':           '#7e57c2',
+  'Video Infrastructure':     '#ec407a',
+  'Clean Energy':             '#66bb6a',
+  'Aerospace & Defense':      '#ef5350',
+  'Autonomous Drones':        '#ab47bc',
+};
+
+// Sector-grouped pie chart
+function drawPie(canvasId, legendId, positions) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 12;
+
+  // Group by sector
+  const sectorMap = {};
+  positions.forEach(p => {
+    const sector = SECTORS[p.ticker] || 'Other';
+    const val = (p.price || p.cost) * p.shares;
+    if (!sectorMap[sector]) sectorMap[sector] = { val: 0, tickers: [] };
+    sectorMap[sector].val += val;
+    sectorMap[sector].tickers.push(p.ticker);
+  });
+
+  const sectors = Object.keys(sectorMap);
+  const total = sectors.reduce((s, k) => s + sectorMap[k].val, 0);
+
+  let start = -Math.PI / 2;
+  sectors.forEach(sector => {
+    const slice = (sectorMap[sector].val / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, start + slice);
+    ctx.fillStyle = SECTOR_COLORS[sector] || '#888';
+    ctx.fill();
+    start += slice;
+  });
+
+  // Center hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.48, 0, 2 * Math.PI);
+  ctx.fillStyle = '#111';
+  ctx.fill();
+
+  // Legend — sector + tickers + %
+  const legend = document.getElementById(legendId);
+  legend.innerHTML = '';
+  sectors.forEach(sector => {
+    const pct = ((sectorMap[sector].val / total) * 100).toFixed(1);
+    const color = SECTOR_COLORS[sector] || '#888';
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.style.cssText = 'width:100%; justify-content:flex-start; gap:6px; margin-bottom:3px;';
+    item.innerHTML = `
+      <div class="legend-dot" style="background:${color}; flex-shrink:0;"></div>
+      <span style="color:#ccc; font-size:11px; font-weight:500;">${sector}</span>
+      <span style="color:#666; font-size:10px;">${sectorMap[sector].tickers.join(', ')}</span>
+      <span style="color:${color}; font-size:11px; margin-left:auto;">${pct}%</span>
+    `;
+    legend.appendChild(item);
+  });
+}
+
+function runDiagnostic() {
+  if (typeof sendPrompt === 'function') {
+    sendPrompt('Run full diagnostic on my Roth IRA 1 — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view');
+  }
+}
+
+function runDiagnostic2() {
+  if (typeof sendPrompt === 'function') {
+    sendPrompt('Run full diagnostic on my Roth IRA 2 — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view');
+  }
+}
+
+function downloadHTML() {
+  const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'roth_ira_dashboard.html';
+  a.click();
+}
+
+// Init
+(async () => {
+  positions1 = await load(STORAGE_KEY1, positions1);
+  positions2 = await load(STORAGE_KEY2, positions2);
+  maCache1 = await loadMAs(MA_KEY1);
+  maCache2 = await loadMAs(MA_KEY2);
+  // Seed test MA so yellow color is visible in sandbox before live fetch
+  if (!maCache1['COST'] || !maCache1['COST'].ma50) {
+    maCache1['COST'] = { ma50: 950.00, ma100: 880.00, ma200: 800.00 };
+  }
+  renderAll();
+  await fetchAll();
+  await fetchAll2();
+})();
+</script>
+</body>
+</html>

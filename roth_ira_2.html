@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Roth IRA 2 — Robinhood</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/iconfont/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0d0d;
+    color: #f5f5f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px 12px 40px;
+  }
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #777; margin: 0 0 8px; }
+  .account-block {
+    background: #111;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    margin-bottom: 12px;
+  }
+  .account-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .account-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; }
+  .account-value { font-size: 22px; font-weight: 600; color: #ffffff; margin-top: 2px; }
+  .account-pnl { font-size: 12px; margin-top: 2px; }
+  .account-cash { font-size: 11px; color: #888; margin-top: 3px; }
+  .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .btn {
+    flex: 1; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 0.5px solid rgba(255,255,255,0.12);
+    background: #1a1a1a; color: #bbb; text-align: center;
+  }
+  .btn.green { background: #21ce99; color: #000; border-color: #21ce99; font-weight: 600; }
+  .btn:active { opacity: 0.7; }
+  .holdings { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .holdings th {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: #888; padding: 4px 4px 6px; text-align: right; border-bottom: 0.5px solid #222;
+  }
+  .holdings th:first-child { text-align: left; }
+  .holdings td { padding: 6px 4px; vertical-align: top; border-bottom: 0.5px solid #1a1a1a; }
+  .holdings tr:last-child td { border-bottom: none; }
+  .ticker { font-weight: 600; font-size: 14px; color: #ffffff; }
+  .shares-cost { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .ma-line { font-size: 11px; margin-top: 4px; line-height: 1.8; color: #B3A000; }
+  .td-right { text-align: right; }
+  .price-val { font-size: 13px; color: #f0f0f0; }
+  .value-val { font-size: 13px; color: #f0f0f0; }
+  .pnl-pos { color: #21ce99; font-size: 12px; }
+  .pnl-neg { color: #ff5000; font-size: 12px; }
+  .pnl-pct { font-size: 11px; opacity: 0.9; }
+  .edit-btn { background: none; border: none; color: #555; cursor: pointer; font-size: 12px; padding: 0 2px; }
+  .edit-btn:hover { color: #888; }
+  .price-input {
+    width: 66px; background: #1a1a1a; border: 0.5px solid #21ce99;
+    color: #fff; border-radius: 4px; padding: 2px 4px; font-size: 12px; text-align: right;
+  }
+  .loading-dot { color: #555; font-size: 12px; }
+  .pie-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 8px; }
+  canvas { display: block; }
+  .pie-legend { display: flex; flex-wrap: wrap; gap: 2px 0; margin-top: 12px; justify-content: flex-start; width: 100%; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #aaa; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .footer { text-align: center; font-size: 11px; color: #555; margin-top: 20px; }
+  .download-link { display: block; text-align: center; font-size: 11px; color: #444; margin-top: 12px; cursor: pointer; text-decoration: none; }
+  .download-link:hover { color: #777; }
+  .up { color: #21ce99; }
+  .dn { color: #ff5000; }
+  .neutral { color: #777; }
+</style>
+</head>
+<body>
+
+<a href="index.html" style="display:inline-block;font-size:11px;color:#555;text-decoration:none;margin-bottom:12px;">← Back</a>
+<div class="section-label">Roth IRA 2 — Robinhood</div>
+<div class="account-block">
+  <div class="account-header">
+    <div>
+      <div class="account-name">Roth IRA 2</div>
+      <div class="account-value" id="ira2-total">—</div>
+      <div class="account-pnl" id="ira2-pnl">—</div>
+      <div class="account-cash" id="ira2-cash">Cash: $593.84</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <div class="btn" onclick="runDiagnostic()"><i class="ti ti-chart-bar"></i> Run Diagnostic ↗</div>
+    <div class="btn green" onclick="fetchAll()"><i class="ti ti-refresh"></i> Refresh</div>
+  </div>
+  <table class="holdings">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th class="td-right">Price</th>
+        <th class="td-right">Value</th>
+        <th class="td-right">P&L</th>
+        <th class="td-right"></th>
+      </tr>
+    </thead>
+    <tbody id="holdings-body"></tbody>
+  </table>
+  <div class="pie-wrap">
+    <canvas id="pie2" width="220" height="220"></canvas>
+    <div class="pie-legend" id="pie2-legend"></div>
+  </div>
+</div>
+
+<a class="download-link" onclick="downloadHTML()">⬇ Download HTML</a>
+<div class="footer" id="last-updated">—</div>
+
+<script>
+const FINNHUB_KEY = "d832a8hr01ql4ong0df0d832a8hr01ql4ong0dfg";
+const BASE = "https://finnhub.io/api/v1/quote";
+const INDICATOR_BASE = "https://finnhub.io/api/v1/stock/indicator";
+const STORAGE_KEY = "rh_ira2_positions";
+const MA_KEY = "rh_ira2_mas";
+const CASH = 593.84;
+
+let positions = [
+  { ticker:'BKKT', shares:105.10,      cost:10.10,   price:null },
+  { ticker:'TE',   shares:60.11378,    cost:10.27,   price:null },
+  { ticker:'QBTS', shares:20.560603,   cost:28.36,   price:null },
+  { ticker:'OPEN', shares:113.0066,    cost:4.82,    price:null },
+  { ticker:'NVO',  shares:12.526705,   cost:45.75,   price:null },
+  { ticker:'IREN', shares:8.073631,    cost:61.93,   price:null },
+  { ticker:'LAC',  shares:86.811584,   cost:5.76,    price:null },
+  { ticker:'DRAM', shares:4.863238,    cost:62.92,   price:null },
+  { ticker:'SMR',  shares:26.45536,    cost:12.54,   price:null },
+  { ticker:'HLIT', shares:21.568764,   cost:16.49,   price:null },
+  { ticker:'CIFR', shares:10.624734,   cost:23.53,   price:null },
+  { ticker:'ENPH', shares:3.732457,    cost:66.98,   price:null },
+  { ticker:'ELMT', shares:12.639029,   cost:19.78,   price:null },
+  { ticker:'NRG',  shares:1.889073,    cost:132.34,  price:null },
+  { ticker:'ONDS', shares:7.701193,    cost:12.99,   price:null },
+];
+
+let maCache = {};
+
+const SECTORS = {
+  BKKT: 'Crypto Infra / Stablecoins', TE: 'Electronic Components',
+  QBTS: 'Quantum Computing', OPEN: 'Real Estate Tech',
+  NVO: 'Pharma / Healthcare', IREN: 'Crypto Mining / AI Infra',
+  LAC: 'Lithium / Materials', DRAM: 'Semiconductors',
+  SMR: 'Nuclear Energy', HLIT: 'Video Infrastructure',
+  CIFR: 'Crypto Mining / AI Infra', ENPH: 'Clean Energy',
+  ELMT: 'Aerospace & Defense', NRG: 'Energy', ONDS: 'Autonomous Drones',
+};
+
+const SECTOR_COLORS = {
+  'Crypto Infra / Stablecoins':'#e67e22','Electronic Components':'#3498db',
+  'Quantum Computing':'#ff4081','Real Estate Tech':'#8bc34a',
+  'Pharma / Healthcare':'#26c6da','Crypto Mining / AI Infra':'#f1c40f',
+  'Lithium / Materials':'#ff9800','Semiconductors':'#4a9eff',
+  'Nuclear Energy':'#7e57c2','Video Infrastructure':'#ec407a',
+  'Clean Energy':'#66bb6a','Aerospace & Defense':'#ef5350',
+  'Energy':'#e74c3c','Autonomous Drones':'#ab47bc',
+};
+
+async function save(data) {
+  const payload = { pos: data, ts: Date.now() };
+  try { if (window.storage) await window.storage.set(STORAGE_KEY, JSON.stringify(payload)); } catch(e) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(e) {}
+}
+
+async function load() {
+  try {
+    if (window.storage) {
+      const r = await window.storage.get(STORAGE_KEY);
+      if (r && r.value) { const d = JSON.parse(r.value); if (d.pos) return d.pos; }
+    }
+  } catch(e) {}
+  try {
+    const ls = localStorage.getItem(STORAGE_KEY);
+    if (ls) { const d = JSON.parse(ls); if (d.pos) return d.pos; }
+  } catch(e) {}
+  return positions;
+}
+
+async function saveMAs(cache) {
+  try { if (window.storage) await window.storage.set(MA_KEY, JSON.stringify(cache)); } catch(e) {}
+  try { localStorage.setItem(MA_KEY, JSON.stringify(cache)); } catch(e) {}
+}
+
+async function loadMAs() {
+  try {
+    if (window.storage) { const r = await window.storage.get(MA_KEY); if (r && r.value) return JSON.parse(r.value); }
+  } catch(e) {}
+  try { const ls = localStorage.getItem(MA_KEY); if (ls) return JSON.parse(ls); } catch(e) {}
+  return {};
+}
+
+async function fetchPrice(ticker) {
+  try {
+    const r = await fetch(`${BASE}?symbol=${ticker}&token=${FINNHUB_KEY}`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.c || null;
+  } catch(e) { return null; }
+}
+
+async function fetchMA(ticker, period) {
+  try {
+    const now = Math.floor(Date.now() / 1000);
+    const from = now - (period + 60) * 24 * 60 * 60;
+    const url = `${INDICATOR_BASE}?symbol=${ticker}&resolution=D&from=${from}&to=${now}&indicator=sma&timeperiod=${period}&token=${FINNHUB_KEY}`;
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d && d.sma && d.sma.length > 0) { const v = d.sma[d.sma.length - 1]; return isNaN(v) ? null : v; }
+    return null;
+  } catch(e) { return null; }
+}
+
+async function fetchAll() {
+  const btn = document.querySelector('.btn.green');
+  if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
+  try {
+    for (let i = 0; i < positions.length; i++) {
+      const p = await fetchPrice(positions[i].ticker);
+      if (p !== null) positions[i].price = p;
+      if (i < positions.length - 1) await new Promise(r => setTimeout(r, 120));
+    }
+    await save(positions);
+    for (let i = 0; i < positions.length; i++) {
+      const t = positions[i].ticker;
+      const [ma50, ma100, ma200] = await Promise.all([fetchMA(t,50), fetchMA(t,100), fetchMA(t,200)]);
+      maCache[t] = { ma50, ma100, ma200 };
+      await new Promise(r => setTimeout(r, 300));
+    }
+    await saveMAs(maCache);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('last-updated').textContent = 'Refresh failed — check network';
+  } finally {
+    render();
+    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
+  }
+}
+
+function fmt(n) { return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function fmtMA(label, val, price) {
+  if (!val) return `<span style="color:#555">${label}: —</span>`;
+  const above = price && price > val;
+  const arrow = above ? '▲' : '▼';
+  return `<span style="color:#B3A000;font-weight:600">${label}</span> <span style="color:#B3A000">${arrow} $${val.toFixed(2)}</span>`;
+}
+
+function render() {
+  const tbody = document.getElementById('holdings-body');
+  tbody.innerHTML = '';
+  let totalVal = 0, totalBasis = 0;
+
+  positions.forEach((p, i) => {
+    const price = p.price;
+    const val = price ? price * p.shares : null;
+    const basis = p.cost * p.shares;
+    const pnlAmt = val !== null ? val - basis : null;
+    const pnlPct = pnlAmt !== null ? (pnlAmt / basis) * 100 : null;
+    if (val) totalVal += val;
+    totalBasis += basis;
+
+    const mas = maCache[p.ticker] || {};
+    const maLine = [
+      fmtMA('50d', mas.ma50, price),
+      fmtMA('100d', mas.ma100, price),
+      fmtMA('200d', mas.ma200, price),
+    ].join(' &nbsp;·&nbsp; ');
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="ticker">${p.ticker}</div>
+        <div class="shares-cost">${p.shares.toFixed(4)} sh · $${p.cost.toFixed(2)} avg</div>
+        <div class="ma-line">${maLine}</div>
+      </td>
+      <td class="td-right">
+        <div class="price-val" id="price-${p.ticker}">
+          ${price ? fmt(price) : '<span class="loading-dot">—</span>'}
+        </div>
+      </td>
+      <td class="td-right"><div class="value-val">${val ? fmt(val) : '—'}</div></td>
+      <td class="td-right">
+        ${pnlAmt !== null
+          ? `<div class="${pnlAmt >= 0 ? 'pnl-pos' : 'pnl-neg'}">${pnlAmt >= 0 ? '+' : ''}${fmt(Math.abs(pnlAmt))}</div>
+             <div class="pnl-pct ${pnlAmt >= 0 ? 'pnl-pos' : 'pnl-neg'}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</div>`
+          : '<span class="neutral">—</span>'}
+      </td>
+      <td class="td-right"><button class="edit-btn" onclick="editPrice(${i})">✏️</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const totalWithCash = totalVal + CASH;
+  document.getElementById('ira2-total').textContent = totalVal ? fmt(totalWithCash) : '—';
+  document.getElementById('ira2-cash').textContent = `Cash: ${fmt(CASH)}`;
+  const pnl = totalVal - totalBasis;
+  const pct = totalBasis > 0 ? (pnl / totalBasis) * 100 : 0;
+  const pnlEl = document.getElementById('ira2-pnl');
+  if (totalVal) {
+    pnlEl.textContent = `vs basis ${pnl >= 0 ? '+' : ''}${fmt(Math.abs(pnl))} (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)`;
+    pnlEl.className = 'account-pnl ' + (pnl >= 0 ? 'up' : 'dn');
+  }
+
+  drawPie();
+}
+
+function editPrice(i) {
+  const el = document.getElementById('price-' + positions[i].ticker);
+  if (!el) return;
+  el.innerHTML = `<input class="price-input" id="ei-${i}" type="number" value="${positions[i].price || ''}" step="0.01">`;
+  const input = document.getElementById('ei-' + i);
+  input.focus(); input.select();
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const v = parseFloat(input.value);
+      if (!isNaN(v) && v > 0) { positions[i].price = v; await save(positions); render(); }
+    }
+    if (e.key === 'Escape') render();
+  });
+}
+
+function drawPie() {
+  const canvas = document.getElementById('pie2');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 12;
+  const sectorMap = {};
+  positions.forEach(p => {
+    const sector = SECTORS[p.ticker] || 'Other';
+    const val = (p.price || p.cost) * p.shares;
+    if (!sectorMap[sector]) sectorMap[sector] = { val: 0, tickers: [] };
+    sectorMap[sector].val += val;
+    sectorMap[sector].tickers.push(p.ticker);
+  });
+  const sectors = Object.keys(sectorMap);
+  const total = sectors.reduce((s, k) => s + sectorMap[k].val, 0);
+  let start = -Math.PI / 2;
+  sectors.forEach(sector => {
+    const slice = (sectorMap[sector].val / total) * 2 * Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, start + slice);
+    ctx.fillStyle = SECTOR_COLORS[sector] || '#888'; ctx.fill();
+    start += slice;
+  });
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.48, 0, 2 * Math.PI);
+  ctx.fillStyle = '#111'; ctx.fill();
+  const legend = document.getElementById('pie2-legend');
+  legend.innerHTML = '';
+  sectors.forEach(sector => {
+    const pct = ((sectorMap[sector].val / total) * 100).toFixed(1);
+    const color = SECTOR_COLORS[sector] || '#888';
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.style.cssText = 'width:100%; justify-content:flex-start; gap:6px; margin-bottom:3px;';
+    item.innerHTML = `
+      <div class="legend-dot" style="background:${color};flex-shrink:0;"></div>
+      <span style="color:#ccc;font-size:11px;font-weight:500;">${sector}</span>
+      <span style="color:#666;font-size:10px;">${sectorMap[sector].tickers.join(', ')}</span>
+      <span style="color:${color};font-size:11px;margin-left:auto;">${pct}%</span>
+    `;
+    legend.appendChild(item);
+  });
+}
+
+function runDiagnostic() {
+  if (typeof sendPrompt === 'function') {
+    sendPrompt('Run full diagnostic on my Roth IRA 2 — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view');
+  }
+}
+
+function downloadHTML() {
+  const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'roth_ira_2.html';
+  a.click();
+}
+
+(async () => {
+  positions = await load();
+  maCache = await loadMAs();
+  render();
+  await fetchAll();
+})();
+</script>
+</body>
+</html>
