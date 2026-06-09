@@ -204,7 +204,7 @@
       <div class="account-name">Brokerage</div>
       <div class="account-value" id="brokerage-total">—</div>
       <div class="account-pnl" id="brokerage-pnl">—</div>
-      <div class="account-cash" id="brokerage-cash">Cash: $0.00</div>
+      <div class="account-cash" id="brokerage-cash">Cash: $7,446.39</div>
     </div>
   </div>
   <div class="btn-row">
@@ -240,6 +240,7 @@ const STORAGE_KEY2 = "rh_ira2_positions";
 const STORAGE_KEY3 = "rh_brokerage_positions";
 const IRA1_COST_BASIS = 7200;
 const IRA2_CASH = 0;
+const BROKERAGE_CASH = 7446.39;
 const MA_KEY3 = "rh_brokerage_mas";
 
 const PIE_COLORS = ['#21ce99','#4a9eff','#ff5000','#f1c40f','#9b59b6','#e67e22','#1abc9c','#e74c3c','#3498db','#2ecc71','#e91e8c','#00bcd4','#ff9800','#8bc34a','#ff4081'];
@@ -343,6 +344,12 @@ let positions2 = [
 
 let positions3 = [
   { ticker:'BTC', shares:1.1563666, cost:71693.86, price:null, fetchSymbol:'BINANCE:BTCUSDT' },
+  { ticker:'XLM',  shares:1.00,  cost:0.21,  price:null, fetchSymbol:'BINANCE:XLMUSDT' },
+  { ticker:'OKLO', shares:45,    cost:63.23, price:null },
+  { ticker:'TE',   shares:117,   cost:10.26, price:null },
+  { ticker:'IREN', shares:40,          cost:57.67, price:null },
+  { ticker:'LAC',  shares:249.6380865, cost:5.05,  price:null },
+  { ticker:'PLAB', shares:4.863813,   cost:30.84, price:null },
 ];
 
 // Storage helpers
@@ -525,10 +532,10 @@ function renderAll() {
 
   // Brokerage
   const r3 = renderTable(positions3, 'holdings-body3', 'editPrice3', maCache3);
-  const brokerageVal = r3.totalVal, brokerageBasis = r3.totalBasis;
+  const brokerageVal = r3.totalVal + BROKERAGE_CASH, brokerageBasis = r3.totalBasis;
   document.getElementById('brokerage-total').textContent = brokerageVal ? fmt(brokerageVal) : '—';
-  document.getElementById('brokerage-cash').textContent = 'Cash: $0.00';
-  const p3pnl = brokerageVal - brokerageBasis;
+  document.getElementById('brokerage-cash').textContent = `Cash: ${fmt(BROKERAGE_CASH)}`;
+  const p3pnl = brokerageVal - brokerageBasis - BROKERAGE_CASH;
   const p3pct = brokerageBasis > 0 ? (p3pnl / brokerageBasis) * 100 : 0;
   const brkEl = document.getElementById('brokerage-pnl');
   if (brokerageVal) {
@@ -538,7 +545,7 @@ function renderAll() {
 
   // Aggregate
   const combinedVal = (ira1Val || 0) + (ira2Val || 0) + (brokerageVal || 0);
-  const combinedBasis = IRA1_COST_BASIS + ira2Basis + IRA2_CASH + brokerageBasis;
+  const combinedBasis = IRA1_COST_BASIS + ira2Basis + IRA2_CASH + brokerageBasis + BROKERAGE_CASH;
   const aggPnl = combinedVal - combinedBasis;
   const aggPct = (aggPnl / combinedBasis) * 100;
   document.getElementById('agg-total').textContent = combinedVal ? fmt(combinedVal) : '—';
@@ -632,6 +639,9 @@ const SECTORS = {
   NRG:  'Energy',
   ONDS: 'Autonomous Drones',
   BTC:  'Cryptocurrency',
+  XLM:  'Cryptocurrency',
+  OKLO: 'Nuclear Energy',
+  PLAB: 'Semiconductors',
 };
 
 const SECTOR_COLORS = {
