@@ -171,7 +171,7 @@
       <div class="account-name">Roth IRA 2</div>
       <div class="account-value" id="ira2-total">—</div>
       <div class="account-pnl" id="ira2-pnl">—</div>
-      <div class="account-cash" id="ira2-cash">Cash: $593.84</div>
+      <div class="account-cash" id="ira2-cash">Cash: $0.00</div>
     </div>
   </div>
   <div class="btn-row">
@@ -196,6 +196,39 @@
   </div>
 </div>
 
+<!-- Robinhood Brokerage -->
+<div class="section-label">Robinhood Brokerage</div>
+<div class="account-block">
+  <div class="account-header">
+    <div>
+      <div class="account-name">Brokerage</div>
+      <div class="account-value" id="brokerage-total">—</div>
+      <div class="account-pnl" id="brokerage-pnl">—</div>
+      <div class="account-cash" id="brokerage-cash">Cash: $0.00</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <div class="btn" onclick="runDiagnostic3()"><i class="ti ti-chart-bar"></i> Run Diagnostic ↗</div>
+    <div class="btn green" id="refresh-btn3" onclick="fetchAll3()"><i class="ti ti-refresh"></i> Refresh</div>
+  </div>
+  <table class="holdings">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th class="td-right">Price</th>
+        <th class="td-right">Value</th>
+        <th class="td-right">P&L</th>
+        <th class="td-right"></th>
+      </tr>
+    </thead>
+    <tbody id="holdings-body3"></tbody>
+  </table>
+  <div class="pie-wrap">
+    <canvas id="pie3" width="220" height="220"></canvas>
+    <div class="pie-legend" id="pie3-legend"></div>
+  </div>
+</div>
+
 <a class="download-link" onclick="downloadHTML()">⬇ Download HTML</a>
 <div class="footer" id="last-updated">—</div>
 
@@ -204,8 +237,10 @@ const FINNHUB_KEY = "d832a8hr01ql4ong0df0d832a8hr01ql4ong0dfg";
 const BASE = "https://finnhub.io/api/v1/quote";
 const STORAGE_KEY1 = "rh_ira1_positions";
 const STORAGE_KEY2 = "rh_ira2_positions";
+const STORAGE_KEY3 = "rh_brokerage_positions";
 const IRA1_COST_BASIS = 7200;
-const IRA2_CASH = 593.84;
+const IRA2_CASH = 0;
+const MA_KEY3 = "rh_brokerage_mas";
 
 const PIE_COLORS = ['#21ce99','#4a9eff','#ff5000','#f1c40f','#9b59b6','#e67e22','#1abc9c','#e74c3c','#3498db','#2ecc71','#e91e8c','#00bcd4','#ff9800','#8bc34a','#ff4081'];
 
@@ -216,6 +251,7 @@ const INDICATOR_BASE = "https://finnhub.io/api/v1/stock/indicator";
 // MA cache: { TICKER: { ma50, ma100, ma200 } }
 let maCache1 = {};
 let maCache2 = {};
+let maCache3 = {};
 
 async function fetchMA(ticker, period) {
   try {
@@ -288,21 +324,25 @@ let positions1 = [
 ];
 
 let positions2 = [
-  { ticker:'BKKT', shares:105.10,      cost:10.10,   price:null },
+  { ticker:'BKKT', shares:121.3100451, cost:9.82,   price:null },
   { ticker:'TE',   shares:60.11378,    cost:10.27,   price:null },
   { ticker:'QBTS', shares:20.560603,   cost:28.36,   price:null },
-  { ticker:'OPEN', shares:113.0066,    cost:4.82,    price:null },
+  { ticker:'OPEN', shares:138.0066,    cost:4.62,    price:null },
   { ticker:'NVO',  shares:12.526705,   cost:45.75,   price:null },
   { ticker:'IREN', shares:8.073631,    cost:61.93,   price:null },
   { ticker:'LAC',  shares:86.811584,   cost:5.76,    price:null },
   { ticker:'DRAM', shares:4.863238,    cost:62.92,   price:null },
-  { ticker:'SMR',  shares:26.45536,    cost:12.54,   price:null },
+  { ticker:'SMR',  shares:52.45536,    cost:11.66,   price:null },
   { ticker:'HLIT', shares:21.568764,   cost:16.49,   price:null },
-  { ticker:'CIFR', shares:10.624734,   cost:23.53,   price:null },
+  { ticker:'CIFR', shares:15.624734,   cost:23.15,   price:null },
   { ticker:'ENPH', shares:3.732457,    cost:66.98,   price:null },
   { ticker:'ELMT', shares:12.639029,   cost:19.78,   price:null },
   { ticker:'NRG',  shares:1.889073,    cost:132.34,  price:null },
-  { ticker:'ONDS', shares:7.701193,    cost:12.99,   price:null },
+  { ticker:'ONDS', shares:17.701193,   cost:11.71,   price:null },
+];
+
+let positions3 = [
+  { ticker:'BTC', shares:1.1563666, cost:71693.86, price:null, fetchSymbol:'BINANCE:BTCUSDT' },
 ];
 
 // Storage helpers
@@ -327,9 +367,10 @@ async function load(key, fallback) {
 }
 
 // Fetch single price
-async function fetchPrice(ticker) {
+async function fetchPrice(ticker, fetchSymbol) {
+  const sym = fetchSymbol || ticker;
   try {
-    const r = await fetch(`${BASE}?symbol=${ticker}&token=${FINNHUB_KEY}`);
+    const r = await fetch(`${BASE}?symbol=${sym}&token=${FINNHUB_KEY}`);
     if (!r.ok) return null;
     const d = await r.json();
     return d.c || null;
@@ -342,7 +383,7 @@ async function fetchAll() {
   if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
   try {
     for (let i = 0; i < positions1.length; i++) {
-      const p = await fetchPrice(positions1[i].ticker);
+      const p = await fetchPrice(positions1[i].ticker, positions1[i].fetchSymbol);
       if (p !== null) positions1[i].price = p;
       if (i < positions1.length - 1) await new Promise(r => setTimeout(r, 120));
     }
@@ -364,7 +405,7 @@ async function fetchAll2() {
   if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
   try {
     for (let i = 0; i < positions2.length; i++) {
-      const p = await fetchPrice(positions2[i].ticker);
+      const p = await fetchPrice(positions2[i].ticker, positions2[i].fetchSymbol);
       if (p !== null) positions2[i].price = p;
       if (i < positions2.length - 1) await new Promise(r => setTimeout(r, 120));
     }
@@ -374,6 +415,28 @@ async function fetchAll2() {
     document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
   } catch(e) {
     document.getElementById('last-updated').textContent = 'IRA 2 refresh failed — check network';
+  } finally {
+    renderAll();
+    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
+  }
+}
+
+// Fetch all Brokerage
+async function fetchAll3() {
+  const btn = document.getElementById('refresh-btn3');
+  if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
+  try {
+    for (let i = 0; i < positions3.length; i++) {
+      const p = await fetchPrice(positions3[i].ticker, positions3[i].fetchSymbol);
+      if (p !== null) positions3[i].price = p;
+      if (i < positions3.length - 1) await new Promise(r => setTimeout(r, 120));
+    }
+    await save(STORAGE_KEY3, positions3);
+    await fetchAllMAs(positions3, maCache3);
+    await saveMAs(MA_KEY3, maCache3);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('last-updated').textContent = 'Brokerage refresh failed — check network';
   } finally {
     renderAll();
     if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
@@ -460,9 +523,22 @@ function renderAll() {
     ira2El.className = 'account-pnl ' + (p2pnl >= 0 ? 'up' : 'dn');
   }
 
+  // Brokerage
+  const r3 = renderTable(positions3, 'holdings-body3', 'editPrice3', maCache3);
+  const brokerageVal = r3.totalVal, brokerageBasis = r3.totalBasis;
+  document.getElementById('brokerage-total').textContent = brokerageVal ? fmt(brokerageVal) : '—';
+  document.getElementById('brokerage-cash').textContent = 'Cash: $0.00';
+  const p3pnl = brokerageVal - brokerageBasis;
+  const p3pct = brokerageBasis > 0 ? (p3pnl / brokerageBasis) * 100 : 0;
+  const brkEl = document.getElementById('brokerage-pnl');
+  if (brokerageVal) {
+    brkEl.textContent = `vs basis ${p3pnl >= 0 ? '+' : ''}${fmt(Math.abs(p3pnl))} (${p3pct >= 0 ? '+' : ''}${p3pct.toFixed(1)}%)`;
+    brkEl.className = 'account-pnl ' + (p3pnl >= 0 ? 'up' : 'dn');
+  }
+
   // Aggregate
-  const combinedVal = (ira1Val || 0) + (ira2Val || 0);
-  const combinedBasis = IRA1_COST_BASIS + ira2Basis + IRA2_CASH;
+  const combinedVal = (ira1Val || 0) + (ira2Val || 0) + (brokerageVal || 0);
+  const combinedBasis = IRA1_COST_BASIS + ira2Basis + IRA2_CASH + brokerageBasis;
   const aggPnl = combinedVal - combinedBasis;
   const aggPct = (aggPnl / combinedBasis) * 100;
   document.getElementById('agg-total').textContent = combinedVal ? fmt(combinedVal) : '—';
@@ -475,6 +551,7 @@ function renderAll() {
 
   drawPie('pie1', 'pie1-legend', positions1);
   drawPie('pie2', 'pie2-legend', positions2);
+  drawPie('pie3', 'pie3-legend', positions3);
 }
 
 // Inline edit IRA1
@@ -511,6 +588,23 @@ function editPrice2(i) {
   });
 }
 
+// Inline edit Brokerage
+function editPrice3(i) {
+  const el = document.getElementById('holdings-body3-price-' + positions3[i].ticker);
+  if (!el) return;
+  const cur = positions3[i].price || '';
+  el.innerHTML = `<input class="price-input" id="ei3-${i}" type="number" value="${cur}" step="0.01">`;
+  const input = document.getElementById('ei3-' + i);
+  input.focus(); input.select();
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const v = parseFloat(input.value);
+      if (!isNaN(v) && v > 0) { positions3[i].price = v; await save(STORAGE_KEY3, positions3); renderAll(); }
+    }
+    if (e.key === 'Escape') renderAll();
+  });
+}
+
 // Sector map
 const SECTORS = {
   COST: 'Consumer Staples',
@@ -537,6 +631,7 @@ const SECTORS = {
   ELMT: 'Aerospace & Defense',
   NRG:  'Energy',
   ONDS: 'Autonomous Drones',
+  BTC:  'Cryptocurrency',
 };
 
 const SECTOR_COLORS = {
@@ -558,6 +653,7 @@ const SECTOR_COLORS = {
   'Clean Energy':             '#66bb6a',
   'Aerospace & Defense':      '#ef5350',
   'Autonomous Drones':        '#ab47bc',
+  'Cryptocurrency':           '#f7931a',
 };
 
 // Sector-grouped pie chart
@@ -629,6 +725,12 @@ function runDiagnostic2() {
   }
 }
 
+function runDiagnostic3() {
+  if (typeof sendPrompt === 'function') {
+    sendPrompt('Run full diagnostic on my Robinhood Brokerage — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view');
+  }
+}
+
 function downloadHTML() {
   const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
   const a = document.createElement('a');
@@ -641,8 +743,10 @@ function downloadHTML() {
 (async () => {
   positions1 = await load(STORAGE_KEY1, positions1);
   positions2 = await load(STORAGE_KEY2, positions2);
+  positions3 = await load(STORAGE_KEY3, positions3);
   maCache1 = await loadMAs(MA_KEY1);
   maCache2 = await loadMAs(MA_KEY2);
+  maCache3 = await loadMAs(MA_KEY3);
   // Seed test MA so yellow color is visible in sandbox before live fetch
   if (!maCache1['COST'] || !maCache1['COST'].ma50) {
     maCache1['COST'] = { ma50: 950.00, ma100: 880.00, ma200: 800.00 };
@@ -650,6 +754,7 @@ function downloadHTML() {
   renderAll();
   await fetchAll();
   await fetchAll2();
+  await fetchAll3();
 })();
 </script>
 </body>
