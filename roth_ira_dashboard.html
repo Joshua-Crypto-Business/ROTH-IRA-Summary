@@ -19,7 +19,6 @@
   h1 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; margin-bottom: 4px; }
   .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #777; margin: 20px 0 8px; }
 
-  /* Aggregate Header */
   .agg-header {
     background: #111;
     border: 0.5px solid rgba(255,255,255,0.08);
@@ -34,7 +33,6 @@
   .agg-meta span.dn { color: #ff5000; }
   .ira2-note { font-size: 11px; color: #666; margin-top: 4px; }
 
-  /* Account Section */
   .account-block {
     background: #111;
     border: 0.5px solid rgba(255,255,255,0.08);
@@ -49,7 +47,6 @@
   .account-pnl { font-size: 12px; margin-top: 2px; }
   .account-cash { font-size: 11px; color: #888; margin-top: 3px; }
 
-  /* Button Row */
   .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
   .btn {
     flex: 1;
@@ -66,7 +63,6 @@
   .btn.green { background: #21ce99; color: #000; border-color: #21ce99; font-weight: 600; }
   .btn:active { opacity: 0.7; }
 
-  /* Holdings Table */
   .holdings { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
   .holdings th {
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
@@ -92,20 +88,17 @@
   }
   .loading-dot { color: #555; font-size: 12px; }
 
-  /* Pie Chart */
   .pie-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 8px; }
   canvas { display: block; }
   .pie-legend { display: flex; flex-wrap: wrap; gap: 2px 0; margin-top: 12px; justify-content: flex-start; width: 100%; }
   .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #aaa; }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-  /* Roth IRA 2 Placeholder */
   .ira2-placeholder {
     text-align: center; padding: 24px 14px; color: #666; font-size: 12px; line-height: 1.6;
   }
   .ira2-placeholder .ira2-title { font-size: 13px; color: #555; font-weight: 600; margin-bottom: 6px; }
 
-  /* Footer */
   .footer { text-align: center; font-size: 11px; color: #555; margin-top: 20px; }
   .download-link { display: block; text-align: center; font-size: 11px; color: #444; margin-top: 12px; cursor: pointer; text-decoration: none; }
   .download-link:hover { color: #777; }
@@ -138,25 +131,14 @@
       <div class="account-cash" id="ira1-cash">Cash: —</div>
     </div>
   </div>
-
   <div class="btn-row">
     <div class="btn" onclick="runDiagnostic()"><i class="ti ti-chart-bar"></i> Run Diagnostic ↗</div>
     <div class="btn green" id="refresh-btn1" onclick="fetchAll()"><i class="ti ti-refresh"></i> Refresh</div>
   </div>
-
   <table class="holdings">
-    <thead>
-      <tr>
-        <th>Position</th>
-        <th class="td-right">Price</th>
-        <th class="td-right">Value</th>
-        <th class="td-right">P&L</th>
-        <th class="td-right"></th>
-      </tr>
-    </thead>
+    <thead><tr><th>Position</th><th class="td-right">Price</th><th class="td-right">Value</th><th class="td-right">P&L</th><th class="td-right"></th></tr></thead>
     <tbody id="holdings-body"></tbody>
   </table>
-
   <div class="pie-wrap">
     <canvas id="pie1" width="220" height="220"></canvas>
     <div class="pie-legend" id="pie1-legend"></div>
@@ -179,15 +161,7 @@
     <div class="btn green" id="refresh-btn2" onclick="fetchAll2()"><i class="ti ti-refresh"></i> Refresh</div>
   </div>
   <table class="holdings">
-    <thead>
-      <tr>
-        <th>Position</th>
-        <th class="td-right">Price</th>
-        <th class="td-right">Value</th>
-        <th class="td-right">P&L</th>
-        <th class="td-right"></th>
-      </tr>
-    </thead>
+    <thead><tr><th>Position</th><th class="td-right">Price</th><th class="td-right">Value</th><th class="td-right">P&L</th><th class="td-right"></th></tr></thead>
     <tbody id="holdings-body2"></tbody>
   </table>
   <div class="pie-wrap">
@@ -212,20 +186,37 @@
     <div class="btn green" id="refresh-btn3" onclick="fetchAll3()"><i class="ti ti-refresh"></i> Refresh</div>
   </div>
   <table class="holdings">
-    <thead>
-      <tr>
-        <th>Position</th>
-        <th class="td-right">Price</th>
-        <th class="td-right">Value</th>
-        <th class="td-right">P&L</th>
-        <th class="td-right"></th>
-      </tr>
-    </thead>
+    <thead><tr><th>Position</th><th class="td-right">Price</th><th class="td-right">Value</th><th class="td-right">P&L</th><th class="td-right"></th></tr></thead>
     <tbody id="holdings-body3"></tbody>
   </table>
   <div class="pie-wrap">
     <canvas id="pie3" width="220" height="220"></canvas>
     <div class="pie-legend" id="pie3-legend"></div>
+  </div>
+</div>
+
+<!-- Coinbase -->
+<div class="section-label">Coinbase</div>
+<div class="account-block">
+  <div class="account-header">
+    <div>
+      <div class="account-name">Coinbase</div>
+      <div class="account-value" id="coinbase-total">—</div>
+      <div class="account-pnl" id="coinbase-pnl">—</div>
+      <div class="account-cash" id="coinbase-cash">Cash: $0.00</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <div class="btn" onclick="runDiagnostic4()"><i class="ti ti-chart-bar"></i> Run Diagnostic ↗</div>
+    <div class="btn green" id="refresh-btn4" onclick="fetchAll4()"><i class="ti ti-refresh"></i> Refresh</div>
+  </div>
+  <table class="holdings">
+    <thead><tr><th>Position</th><th class="td-right">Price</th><th class="td-right">Value</th><th class="td-right">P&L</th><th class="td-right"></th></tr></thead>
+    <tbody id="holdings-body4"></tbody>
+  </table>
+  <div class="pie-wrap">
+    <canvas id="pie4" width="220" height="220"></canvas>
+    <div class="pie-legend" id="pie4-legend"></div>
   </div>
 </div>
 
@@ -238,21 +229,20 @@ const BASE = "https://finnhub.io/api/v1/quote";
 const STORAGE_KEY1 = "rh_ira1_positions";
 const STORAGE_KEY2 = "rh_ira2_positions";
 const STORAGE_KEY3 = "rh_brokerage_positions";
+const STORAGE_KEY4 = "cb_coinbase_positions";
 const IRA1_COST_BASIS = 7200;
 const IRA2_CASH = 0;
 const BROKERAGE_CASH = 7446.39;
+const COINBASE_CASH = 0;
+const MA_KEY1 = "rh_ira1_mas";
+const MA_KEY2 = "rh_ira2_mas";
 const MA_KEY3 = "rh_brokerage_mas";
+const MA_KEY4 = "cb_coinbase_mas";
+const INDICATOR_BASE = "https://finnhub.io/api/v1/stock/indicator";
 
 const PIE_COLORS = ['#21ce99','#4a9eff','#ff5000','#f1c40f','#9b59b6','#e67e22','#1abc9c','#e74c3c','#3498db','#2ecc71','#e91e8c','#00bcd4','#ff9800','#8bc34a','#ff4081'];
 
-const MA_KEY1 = "rh_ira1_mas";
-const MA_KEY2 = "rh_ira2_mas";
-const INDICATOR_BASE = "https://finnhub.io/api/v1/stock/indicator";
-
-// MA cache: { TICKER: { ma50, ma100, ma200 } }
-let maCache1 = {};
-let maCache2 = {};
-let maCache3 = {};
+let maCache1 = {}, maCache2 = {}, maCache3 = {}, maCache4 = {};
 
 async function fetchMA(ticker, period) {
   try {
@@ -274,9 +264,7 @@ async function fetchAllMAs(positions, cache) {
   for (let i = 0; i < positions.length; i++) {
     const t = positions[i].ticker;
     const [ma50, ma100, ma200] = await Promise.all([
-      fetchMA(t, 50),
-      fetchMA(t, 100),
-      fetchMA(t, 200),
+      fetchMA(t, 50), fetchMA(t, 100), fetchMA(t, 200),
     ]);
     cache[t] = { ma50, ma100, ma200 };
     await new Promise(r => setTimeout(r, 300));
@@ -295,10 +283,7 @@ async function loadMAs(key) {
       if (r && r.value) return JSON.parse(r.value);
     }
   } catch(e) {}
-  try {
-    const ls = localStorage.getItem(key);
-    if (ls) return JSON.parse(ls);
-  } catch(e) {}
+  try { const ls = localStorage.getItem(key); if (ls) return JSON.parse(ls); } catch(e) {}
   return {};
 }
 
@@ -306,53 +291,55 @@ function fmtMA(label, val, price) {
   if (!val) return `<span style="color:#555">${label}: —</span>`;
   const above = price && price > val;
   const arrow = above ? '▲' : '▼';
-  const color = above ? '#21ce99' : '#ff5000';
   return `<span style="color:#B3A000;font-weight:600">${label}</span> <span style="color:#B3A000">${arrow} $${val.toFixed(2)}</span>`;
 }
 
 let positions1 = [
-  { ticker:'COST', shares:0.49432,    cost:1011.49,  price:null },
-  { ticker:'DVN',  shares:21.419575,  cost:46.69,    price:null },
-  { ticker:'ENTG', shares:3.338563,   cost:149.77,   price:null },
-  { ticker:'HIVE', shares:75.301204,  cost:3.32,     price:null },
-  { ticker:'IREN', shares:19.675356,  cost:50.83,    price:null },
-  { ticker:'MRVL', shares:5.883737,   cost:169.96,   price:null },
-  { ticker:'NOW',  shares:11.17693,   cost:89.47,    price:null },
-  { ticker:'RBLX', shares:5.929791,   cost:42.16,    price:null },
-  { ticker:'SHAZ', shares:4.06285,    cost:56.01,    price:null },
-  { ticker:'SNDK', shares:0.666927,   cost:1472.60,  price:null },
-  { ticker:'TE',   shares:75.681893,  cost:6.61,     price:null },
+  { ticker:'COST', shares:0.49432,    cost:1011.49, price:null },
+  { ticker:'DVN',  shares:21.419575,  cost:46.69,   price:null },
+  { ticker:'ENTG', shares:3.338563,   cost:149.77,  price:null },
+  { ticker:'HIVE', shares:75.301204,  cost:3.32,    price:null },
+  { ticker:'IREN', shares:19.675356,  cost:50.83,   price:null },
+  { ticker:'MRVL', shares:5.883737,   cost:169.96,  price:null },
+  { ticker:'NOW',  shares:11.17693,   cost:89.47,   price:null },
+  { ticker:'RBLX', shares:5.929791,   cost:42.16,   price:null },
+  { ticker:'SHAZ', shares:4.06285,    cost:56.01,   price:null },
+  { ticker:'SNDK', shares:0.666927,   cost:1472.60, price:null },
+  { ticker:'TE',   shares:75.681893,  cost:6.61,    price:null },
 ];
 
 let positions2 = [
-  { ticker:'BKKT', shares:121.3100451, cost:9.82,   price:null },  // $1,191
-  { ticker:'OPEN', shares:138.0066,    cost:4.62,   price:null },  // $638
-  { ticker:'TE',   shares:60.11378,    cost:10.27,  price:null },  // $617
-  { ticker:'SMR',  shares:52.45536,    cost:11.66,  price:null },  // $612
-  { ticker:'QBTS', shares:20.560603,   cost:28.36,  price:null },  // $583
-  { ticker:'NVO',  shares:12.526705,   cost:45.75,  price:null },  // $573
-  { ticker:'LAC',  shares:86.811584,   cost:5.76,   price:null },  // $500
-  { ticker:'IREN', shares:8.073631,    cost:61.93,  price:null },  // $500
-  { ticker:'CIFR', shares:15.624734,   cost:23.15,  price:null },  // $362
-  { ticker:'HLIT', shares:21.568764,   cost:16.49,  price:null },  // $356
-  { ticker:'DRAM', shares:4.863238,    cost:62.92,  price:null },  // $306
-  { ticker:'ELMT', shares:12.639029,   cost:19.78,  price:null },  // $250
-  { ticker:'ENPH', shares:3.732457,    cost:66.98,  price:null },  // $250
-  { ticker:'NRG',  shares:1.889073,    cost:132.34, price:null },  // $250
-  { ticker:'ONDS', shares:17.701193,   cost:11.71,  price:null },  // $207
+  { ticker:'BKKT', shares:121.3100451, cost:9.82,   price:null },
+  { ticker:'OPEN', shares:138.0066,    cost:4.62,   price:null },
+  { ticker:'TE',   shares:60.11378,    cost:10.27,  price:null },
+  { ticker:'SMR',  shares:52.45536,    cost:11.66,  price:null },
+  { ticker:'QBTS', shares:20.560603,   cost:28.36,  price:null },
+  { ticker:'NVO',  shares:12.526705,   cost:45.75,  price:null },
+  { ticker:'LAC',  shares:86.811584,   cost:5.76,   price:null },
+  { ticker:'IREN', shares:8.073631,    cost:61.93,  price:null },
+  { ticker:'CIFR', shares:15.624734,   cost:23.15,  price:null },
+  { ticker:'HLIT', shares:21.568764,   cost:16.49,  price:null },
+  { ticker:'DRAM', shares:4.863238,    cost:62.92,  price:null },
+  { ticker:'ELMT', shares:12.639029,   cost:19.78,  price:null },
+  { ticker:'ENPH', shares:3.732457,    cost:66.98,  price:null },
+  { ticker:'NRG',  shares:1.889073,    cost:132.34, price:null },
+  { ticker:'ONDS', shares:17.701193,   cost:11.71,  price:null },
 ];
 
 let positions3 = [
-  { ticker:'BTC', shares:1.1563666, cost:71693.86, price:null, fetchSymbol:'BINANCE:BTCUSDT' },
-  { ticker:'XLM',  shares:1.00,  cost:0.21,  price:null, fetchSymbol:'BINANCE:XLMUSDT' },
-  { ticker:'OKLO', shares:45,    cost:63.23, price:null },
-  { ticker:'TE',   shares:117,   cost:10.26, price:null },
-  { ticker:'IREN', shares:40,          cost:57.67, price:null },
-  { ticker:'LAC',  shares:249.6380865, cost:5.05,  price:null },
-  { ticker:'PLAB', shares:4.863813,   cost:30.84, price:null },
+  { ticker:'BTC',  shares:1.1563666,   cost:71693.86, price:null, fetchSymbol:'BINANCE:BTCUSDT' },
+  { ticker:'XLM',  shares:1.00,        cost:0.21,     price:null, fetchSymbol:'BINANCE:XLMUSDT' },
+  { ticker:'OKLO', shares:45,          cost:63.23,    price:null },
+  { ticker:'TE',   shares:117,         cost:10.26,    price:null },
+  { ticker:'IREN', shares:40,          cost:57.67,    price:null },
+  { ticker:'LAC',  shares:249.6380865, cost:5.05,     price:null },
+  { ticker:'PLAB', shares:4.863813,    cost:30.84,    price:null },
 ];
 
-// Storage helpers
+let positions4 = [
+  { ticker:'XRP', shares:14000, cost:1.00, price:null, fetchSymbol:'BINANCE:XRPUSDT' },
+];
+
 async function save(key, data) {
   const payload = { pos: data, ts: Date.now() };
   try { if (window.storage) await window.storage.set(key, JSON.stringify(payload)); } catch(e) {}
@@ -368,19 +355,14 @@ async function load(key, fallback) {
     }
   } catch(e) {}
   if (!stored) {
-    try {
-      const ls = localStorage.getItem(key);
-      if (ls) { const d = JSON.parse(ls); if (d.pos) stored = d.pos; }
-    } catch(e) {}
+    try { const ls = localStorage.getItem(key); if (ls) { const d = JSON.parse(ls); if (d.pos) stored = d.pos; } } catch(e) {}
   }
   if (!stored) return fallback;
-  // Always use fallback as the authoritative position list; only restore cached prices
   const priceMap = {};
   stored.forEach(p => { priceMap[p.ticker] = p.price; });
   return fallback.map(p => ({ ...p, price: priceMap[p.ticker] ?? p.price }));
 }
 
-// Fetch single price
 async function fetchPrice(ticker, fetchSymbol) {
   const sym = fetchSymbol || ticker;
   try {
@@ -391,7 +373,6 @@ async function fetchPrice(ticker, fetchSymbol) {
   } catch(e) { return null; }
 }
 
-// Fetch all IRA1
 async function fetchAll() {
   const btn = document.getElementById('refresh-btn1');
   if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
@@ -407,13 +388,9 @@ async function fetchAll() {
     document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
   } catch(e) {
     document.getElementById('last-updated').textContent = 'IRA 1 refresh failed — check network';
-  } finally {
-    renderAll();
-    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
-  }
+  } finally { renderAll(); if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; } }
 }
 
-// Fetch all IRA2
 async function fetchAll2() {
   const btn = document.getElementById('refresh-btn2');
   if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
@@ -429,13 +406,9 @@ async function fetchAll2() {
     document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
   } catch(e) {
     document.getElementById('last-updated').textContent = 'IRA 2 refresh failed — check network';
-  } finally {
-    renderAll();
-    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
-  }
+  } finally { renderAll(); if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; } }
 }
 
-// Fetch all Brokerage
 async function fetchAll3() {
   const btn = document.getElementById('refresh-btn3');
   if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
@@ -451,10 +424,25 @@ async function fetchAll3() {
     document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
   } catch(e) {
     document.getElementById('last-updated').textContent = 'Brokerage refresh failed — check network';
-  } finally {
-    renderAll();
-    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; }
-  }
+  } finally { renderAll(); if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; } }
+}
+
+async function fetchAll4() {
+  const btn = document.getElementById('refresh-btn4');
+  if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; }
+  try {
+    for (let i = 0; i < positions4.length; i++) {
+      const p = await fetchPrice(positions4[i].ticker, positions4[i].fetchSymbol);
+      if (p !== null) positions4[i].price = p;
+      if (i < positions4.length - 1) await new Promise(r => setTimeout(r, 120));
+    }
+    await save(STORAGE_KEY4, positions4);
+    await fetchAllMAs(positions4, maCache4);
+    await saveMAs(MA_KEY4, maCache4);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('last-updated').textContent = 'Coinbase refresh failed — check network';
+  } finally { renderAll(); if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; } }
 }
 
 function fmt(n) { return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
@@ -463,7 +451,6 @@ function renderTable(positions, tbodyId, editFn, maCache) {
   const tbody = document.getElementById(tbodyId);
   tbody.innerHTML = '';
   let totalVal = 0, totalBasis = 0;
-
   positions.forEach((p, i) => {
     const price = p.price;
     const val = price ? price * p.shares : null;
@@ -472,14 +459,12 @@ function renderTable(positions, tbodyId, editFn, maCache) {
     const pnlPct = pnlAmt !== null ? (pnlAmt / basis) * 100 : null;
     if (val) totalVal += val;
     totalBasis += basis;
-
     const mas = (maCache && maCache[p.ticker]) || {};
     const maLine = [
       fmtMA('50d', mas.ma50, price),
       fmtMA('100d', mas.ma100, price),
       fmtMA('200d', mas.ma200, price),
     ].join(' &nbsp;·&nbsp; ');
-
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
@@ -492,18 +477,14 @@ function renderTable(positions, tbodyId, editFn, maCache) {
           ${price ? fmt(price) : '<span class="loading-dot">—</span>'}
         </div>
       </td>
-      <td class="td-right">
-        <div class="value-val">${val ? fmt(val) : '—'}</div>
-      </td>
+      <td class="td-right"><div class="value-val">${val ? fmt(val) : '—'}</div></td>
       <td class="td-right">
         ${pnlAmt !== null
           ? `<div class="${pnlAmt >= 0 ? 'pnl-pos' : 'pnl-neg'}">${pnlAmt >= 0 ? '+' : ''}${fmt(Math.abs(pnlAmt))}</div>
              <div class="pnl-pct ${pnlAmt >= 0 ? 'pnl-pos' : 'pnl-neg'}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</div>`
           : '<span class="neutral">—</span>'}
       </td>
-      <td class="td-right">
-        <button class="edit-btn" onclick="${editFn}(${i})" title="Edit price">✏️</button>
-      </td>
+      <td class="td-right"><button class="edit-btn" onclick="${editFn}(${i})" title="Edit price">✏️</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -511,7 +492,6 @@ function renderTable(positions, tbodyId, editFn, maCache) {
 }
 
 function renderAll() {
-  // IRA1
   const r1 = renderTable(positions1, 'holdings-body', 'editPrice1', maCache1);
   const ira1Val = r1.totalVal, ira1Basis = r1.totalBasis;
   document.getElementById('ira1-total').textContent = ira1Val ? fmt(ira1Val) : '—';
@@ -519,12 +499,8 @@ function renderAll() {
   const p1pnl = ira1Val - ira1Basis;
   const p1pct = (p1pnl / ira1Basis) * 100;
   const ira1El = document.getElementById('ira1-pnl');
-  if (ira1Val) {
-    ira1El.textContent = `vs basis ${p1pnl >= 0 ? '+' : ''}${fmt(Math.abs(p1pnl))} (${p1pct >= 0 ? '+' : ''}${p1pct.toFixed(1)}%)`;
-    ira1El.className = 'account-pnl ' + (p1pnl >= 0 ? 'up' : 'dn');
-  }
+  if (ira1Val) { ira1El.textContent = `vs basis ${p1pnl >= 0 ? '+' : ''}${fmt(Math.abs(p1pnl))} (${p1pct >= 0 ? '+' : ''}${p1pct.toFixed(1)}%)`; ira1El.className = 'account-pnl ' + (p1pnl >= 0 ? 'up' : 'dn'); }
 
-  // IRA2
   const r2 = renderTable(positions2, 'holdings-body2', 'editPrice2', maCache2);
   const ira2Val = r2.totalVal + IRA2_CASH, ira2Basis = r2.totalBasis;
   document.getElementById('ira2-total').textContent = ira2Val ? fmt(ira2Val) : '—';
@@ -532,12 +508,8 @@ function renderAll() {
   const p2pnl = ira2Val - ira2Basis - IRA2_CASH;
   const p2pct = ira2Basis > 0 ? (p2pnl / ira2Basis) * 100 : 0;
   const ira2El = document.getElementById('ira2-pnl');
-  if (r2.totalVal) {
-    ira2El.textContent = `vs basis ${p2pnl >= 0 ? '+' : ''}${fmt(Math.abs(p2pnl))} (${p2pct >= 0 ? '+' : ''}${p2pct.toFixed(1)}%) · Cash ${fmt(IRA2_CASH)}`;
-    ira2El.className = 'account-pnl ' + (p2pnl >= 0 ? 'up' : 'dn');
-  }
+  if (r2.totalVal) { ira2El.textContent = `vs basis ${p2pnl >= 0 ? '+' : ''}${fmt(Math.abs(p2pnl))} (${p2pct >= 0 ? '+' : ''}${p2pct.toFixed(1)}%) · Cash ${fmt(IRA2_CASH)}`; ira2El.className = 'account-pnl ' + (p2pnl >= 0 ? 'up' : 'dn'); }
 
-  // Brokerage
   const r3 = renderTable(positions3, 'holdings-body3', 'editPrice3', maCache3);
   const brokerageVal = r3.totalVal + BROKERAGE_CASH, brokerageBasis = r3.totalBasis;
   document.getElementById('brokerage-total').textContent = brokerageVal ? fmt(brokerageVal) : '—';
@@ -545,143 +517,108 @@ function renderAll() {
   const p3pnl = brokerageVal - brokerageBasis - BROKERAGE_CASH;
   const p3pct = brokerageBasis > 0 ? (p3pnl / brokerageBasis) * 100 : 0;
   const brkEl = document.getElementById('brokerage-pnl');
-  if (brokerageVal) {
-    brkEl.textContent = `vs basis ${p3pnl >= 0 ? '+' : ''}${fmt(Math.abs(p3pnl))} (${p3pct >= 0 ? '+' : ''}${p3pct.toFixed(1)}%)`;
-    brkEl.className = 'account-pnl ' + (p3pnl >= 0 ? 'up' : 'dn');
-  }
+  if (brokerageVal) { brkEl.textContent = `vs basis ${p3pnl >= 0 ? '+' : ''}${fmt(Math.abs(p3pnl))} (${p3pct >= 0 ? '+' : ''}${p3pct.toFixed(1)}%)`; brkEl.className = 'account-pnl ' + (p3pnl >= 0 ? 'up' : 'dn'); }
 
-  // Aggregate
-  const combinedVal = (ira1Val || 0) + (ira2Val || 0) + (brokerageVal || 0);
-  const combinedBasis = IRA1_COST_BASIS + ira2Basis + IRA2_CASH + brokerageBasis + BROKERAGE_CASH;
+  const r4 = renderTable(positions4, 'holdings-body4', 'editPrice4', maCache4);
+  const coinbaseVal = r4.totalVal + COINBASE_CASH, coinbaseBasis = r4.totalBasis;
+  document.getElementById('coinbase-total').textContent = coinbaseVal ? fmt(coinbaseVal) : '—';
+  document.getElementById('coinbase-cash').textContent = `Cash: ${fmt(COINBASE_CASH)}`;
+  const p4pnl = coinbaseVal - coinbaseBasis - COINBASE_CASH;
+  const p4pct = coinbaseBasis > 0 ? (p4pnl / coinbaseBasis) * 100 : 0;
+  const cbEl = document.getElementById('coinbase-pnl');
+  if (coinbaseVal) { cbEl.textContent = `vs basis ${p4pnl >= 0 ? '+' : ''}${fmt(Math.abs(p4pnl))} (${p4pct >= 0 ? '+' : ''}${p4pct.toFixed(1)}%)`; cbEl.className = 'account-pnl ' + (p4pnl >= 0 ? 'up' : 'dn'); }
+
+  const combinedVal = (ira1Val || 0) + (ira2Val || 0) + (brokerageVal || 0) + (coinbaseVal || 0);
+  const combinedBasis = IRA1_COST_BASIS + ira2Basis + IRA2_CASH + brokerageBasis + BROKERAGE_CASH + coinbaseBasis + COINBASE_CASH;
   const aggPnl = combinedVal - combinedBasis;
   const aggPct = (aggPnl / combinedBasis) * 100;
   document.getElementById('agg-total').textContent = combinedVal ? fmt(combinedVal) : '—';
   document.getElementById('agg-basis').textContent = `Basis: ${fmt(combinedBasis)}`;
   const aggEl = document.getElementById('agg-pnl');
-  if (combinedVal) {
-    aggEl.textContent = `P&L: ${aggPnl >= 0 ? '+' : ''}${fmt(Math.abs(aggPnl))} (${aggPct >= 0 ? '+' : ''}${aggPct.toFixed(1)}%)`;
-    aggEl.className = aggPnl >= 0 ? 'up' : 'dn';
-  }
+  if (combinedVal) { aggEl.textContent = `P&L: ${aggPnl >= 0 ? '+' : ''}${fmt(Math.abs(aggPnl))} (${aggPct >= 0 ? '+' : ''}${aggPct.toFixed(1)}%)`; aggEl.className = aggPnl >= 0 ? 'up' : 'dn'; }
 
   drawPie('pie1', 'pie1-legend', positions1);
   drawPie('pie2', 'pie2-legend', positions2);
   drawPie('pie3', 'pie3-legend', positions3);
+  drawPie('pie4', 'pie4-legend', positions4);
 }
 
-// Inline edit IRA1
 function editPrice1(i) {
   const el = document.getElementById('holdings-body-price-' + positions1[i].ticker);
   if (!el) return;
-  const cur = positions1[i].price || '';
-  el.innerHTML = `<input class="price-input" id="ei1-${i}" type="number" value="${cur}" step="0.01">`;
+  el.innerHTML = `<input class="price-input" id="ei1-${i}" type="number" value="${positions1[i].price||''}" step="0.01">`;
   const input = document.getElementById('ei1-' + i);
   input.focus(); input.select();
   input.addEventListener('keydown', async (e) => {
-    if (e.key === 'Enter') {
-      const v = parseFloat(input.value);
-      if (!isNaN(v) && v > 0) { positions1[i].price = v; await save(STORAGE_KEY1, positions1); renderAll(); }
-    }
+    if (e.key === 'Enter') { const v = parseFloat(input.value); if (!isNaN(v) && v > 0) { positions1[i].price = v; await save(STORAGE_KEY1, positions1); renderAll(); } }
     if (e.key === 'Escape') renderAll();
   });
 }
 
-// Inline edit IRA2
 function editPrice2(i) {
   const el = document.getElementById('holdings-body2-price-' + positions2[i].ticker);
   if (!el) return;
-  const cur = positions2[i].price || '';
-  el.innerHTML = `<input class="price-input" id="ei2-${i}" type="number" value="${cur}" step="0.01">`;
+  el.innerHTML = `<input class="price-input" id="ei2-${i}" type="number" value="${positions2[i].price||''}" step="0.01">`;
   const input = document.getElementById('ei2-' + i);
   input.focus(); input.select();
   input.addEventListener('keydown', async (e) => {
-    if (e.key === 'Enter') {
-      const v = parseFloat(input.value);
-      if (!isNaN(v) && v > 0) { positions2[i].price = v; await save(STORAGE_KEY2, positions2); renderAll(); }
-    }
+    if (e.key === 'Enter') { const v = parseFloat(input.value); if (!isNaN(v) && v > 0) { positions2[i].price = v; await save(STORAGE_KEY2, positions2); renderAll(); } }
     if (e.key === 'Escape') renderAll();
   });
 }
 
-// Inline edit Brokerage
 function editPrice3(i) {
   const el = document.getElementById('holdings-body3-price-' + positions3[i].ticker);
   if (!el) return;
-  const cur = positions3[i].price || '';
-  el.innerHTML = `<input class="price-input" id="ei3-${i}" type="number" value="${cur}" step="0.01">`;
+  el.innerHTML = `<input class="price-input" id="ei3-${i}" type="number" value="${positions3[i].price||''}" step="0.01">`;
   const input = document.getElementById('ei3-' + i);
   input.focus(); input.select();
   input.addEventListener('keydown', async (e) => {
-    if (e.key === 'Enter') {
-      const v = parseFloat(input.value);
-      if (!isNaN(v) && v > 0) { positions3[i].price = v; await save(STORAGE_KEY3, positions3); renderAll(); }
-    }
+    if (e.key === 'Enter') { const v = parseFloat(input.value); if (!isNaN(v) && v > 0) { positions3[i].price = v; await save(STORAGE_KEY3, positions3); renderAll(); } }
     if (e.key === 'Escape') renderAll();
   });
 }
 
-// Sector map
+function editPrice4(i) {
+  const el = document.getElementById('holdings-body4-price-' + positions4[i].ticker);
+  if (!el) return;
+  el.innerHTML = `<input class="price-input" id="ei4-${i}" type="number" value="${positions4[i].price||''}" step="0.01">`;
+  const input = document.getElementById('ei4-' + i);
+  input.focus(); input.select();
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') { const v = parseFloat(input.value); if (!isNaN(v) && v > 0) { positions4[i].price = v; await save(STORAGE_KEY4, positions4); renderAll(); } }
+    if (e.key === 'Escape') renderAll();
+  });
+}
+
 const SECTORS = {
-  COST: 'Consumer Staples',
-  DVN:  'Energy',
-  ENTG: 'Semiconductors',
-  HIVE: 'Crypto Mining / AI Infra',
-  IREN: 'Crypto Mining / AI Infra',
-  MRVL: 'Semiconductors',
-  NOW:  'Enterprise Software',
-  RBLX: 'Gaming',
-  SHAZ: 'AI Infrastructure',
-  SNDK: 'Semiconductors',
-  TE:   'Electronic Components',
-  BKKT: 'Crypto Infra / Stablecoins',
-  QBTS: 'Quantum Computing',
-  OPEN: 'Real Estate Tech',
-  NVO:  'Pharma / Healthcare',
-  LAC:  'Lithium / Materials',
-  DRAM: 'Semiconductors',
-  SMR:  'Nuclear Energy',
-  HLIT: 'Video Infrastructure',
-  CIFR: 'Crypto Mining / AI Infra',
-  ENPH: 'Clean Energy',
-  ELMT: 'Aerospace & Defense',
-  NRG:  'Energy',
-  ONDS: 'Autonomous Drones',
-  BTC:  'Cryptocurrency',
-  XLM:  'Cryptocurrency',
-  OKLO: 'Nuclear Energy',
-  PLAB: 'Semiconductors',
+  COST:'Consumer Staples', DVN:'Energy', ENTG:'Semiconductors', HIVE:'Crypto Mining / AI Infra',
+  IREN:'Crypto Mining / AI Infra', MRVL:'Semiconductors', NOW:'Enterprise Software', RBLX:'Gaming',
+  SHAZ:'AI Infrastructure', SNDK:'Semiconductors', TE:'Electronic Components',
+  BKKT:'Crypto Infra / Stablecoins', QBTS:'Quantum Computing', OPEN:'Real Estate Tech',
+  NVO:'Pharma / Healthcare', LAC:'Lithium / Materials', DRAM:'Semiconductors', SMR:'Nuclear Energy',
+  HLIT:'Video Infrastructure', CIFR:'Crypto Mining / AI Infra', ENPH:'Clean Energy',
+  ELMT:'Aerospace & Defense', NRG:'Energy', ONDS:'Autonomous Drones',
+  BTC:'Cryptocurrency', XLM:'Cryptocurrency', XRP:'Cryptocurrency',
+  OKLO:'Nuclear Energy', PLAB:'Semiconductors',
 };
 
 const SECTOR_COLORS = {
-  'Semiconductors':           '#4a9eff',
-  'Crypto Mining / AI Infra': '#f1c40f',
-  'Crypto Infra / Stablecoins':'#e67e22',
-  'Energy':                   '#e74c3c',
-  'Consumer Staples':         '#21ce99',
-  'Enterprise Software':      '#9b59b6',
-  'Gaming':                   '#1abc9c',
-  'AI Infrastructure':        '#00bcd4',
-  'Electronic Components':    '#3498db',
-  'Quantum Computing':        '#ff4081',
-  'Real Estate Tech':         '#8bc34a',
-  'Pharma / Healthcare':      '#26c6da',
-  'Lithium / Materials':      '#ff9800',
-  'Nuclear Energy':           '#7e57c2',
-  'Video Infrastructure':     '#ec407a',
-  'Clean Energy':             '#66bb6a',
-  'Aerospace & Defense':      '#ef5350',
-  'Autonomous Drones':        '#ab47bc',
-  'Cryptocurrency':           '#f7931a',
+  'Semiconductors':'#4a9eff', 'Crypto Mining / AI Infra':'#f1c40f',
+  'Crypto Infra / Stablecoins':'#e67e22', 'Energy':'#e74c3c', 'Consumer Staples':'#21ce99',
+  'Enterprise Software':'#9b59b6', 'Gaming':'#1abc9c', 'AI Infrastructure':'#00bcd4',
+  'Electronic Components':'#3498db', 'Quantum Computing':'#ff4081', 'Real Estate Tech':'#8bc34a',
+  'Pharma / Healthcare':'#26c6da', 'Lithium / Materials':'#ff9800', 'Nuclear Energy':'#7e57c2',
+  'Video Infrastructure':'#ec407a', 'Clean Energy':'#66bb6a', 'Aerospace & Defense':'#ef5350',
+  'Autonomous Drones':'#ab47bc', 'Cryptocurrency':'#f7931a',
 };
 
-// Sector-grouped pie chart
 function drawPie(canvasId, legendId, positions) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 12;
-
-  // Group by sector
   const sectorMap = {};
   positions.forEach(p => {
     const sector = SECTORS[p.ticker] || 'Other';
@@ -690,28 +627,19 @@ function drawPie(canvasId, legendId, positions) {
     sectorMap[sector].val += val;
     sectorMap[sector].tickers.push(p.ticker);
   });
-
   const sectors = Object.keys(sectorMap);
   const total = sectors.reduce((s, k) => s + sectorMap[k].val, 0);
-
   let start = -Math.PI / 2;
   sectors.forEach(sector => {
     const slice = (sectorMap[sector].val / total) * 2 * Math.PI;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
+    ctx.beginPath(); ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r, start, start + slice);
     ctx.fillStyle = SECTOR_COLORS[sector] || '#888';
     ctx.fill();
     start += slice;
   });
-
-  // Center hole
-  ctx.beginPath();
-  ctx.arc(cx, cy, r * 0.48, 0, 2 * Math.PI);
-  ctx.fillStyle = '#111';
-  ctx.fill();
-
-  // Legend — sector + tickers + %
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.48, 0, 2 * Math.PI);
+  ctx.fillStyle = '#111'; ctx.fill();
   const legend = document.getElementById(legendId);
   legend.innerHTML = '';
   sectors.forEach(sector => {
@@ -730,23 +658,10 @@ function drawPie(canvasId, legendId, positions) {
   });
 }
 
-function runDiagnostic() {
-  if (typeof sendPrompt === 'function') {
-    sendPrompt('Run full diagnostic on my Roth IRA 1 — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view');
-  }
-}
-
-function runDiagnostic2() {
-  if (typeof sendPrompt === 'function') {
-    sendPrompt('Run full diagnostic on my Roth IRA 2 — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view');
-  }
-}
-
-function runDiagnostic3() {
-  if (typeof sendPrompt === 'function') {
-    sendPrompt('Run full diagnostic on my Robinhood Brokerage — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view');
-  }
-}
+function runDiagnostic() { if (typeof sendPrompt === 'function') sendPrompt('Run full diagnostic on my Roth IRA 1 — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view'); }
+function runDiagnostic2() { if (typeof sendPrompt === 'function') sendPrompt('Run full diagnostic on my Roth IRA 2 — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view'); }
+function runDiagnostic3() { if (typeof sendPrompt === 'function') sendPrompt('Run full diagnostic on my Robinhood Brokerage — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view'); }
+function runDiagnostic4() { if (typeof sendPrompt === 'function') sendPrompt('Run full diagnostic on my Coinbase account — position by position with McGlone macro lens, Lavish liquidity read, and Weisberger market structure view'); }
 
 function downloadHTML() {
   const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
@@ -756,15 +671,15 @@ function downloadHTML() {
   a.click();
 }
 
-// Init
 (async () => {
   positions1 = await load(STORAGE_KEY1, positions1);
   positions2 = await load(STORAGE_KEY2, positions2);
   positions3 = await load(STORAGE_KEY3, positions3);
+  positions4 = await load(STORAGE_KEY4, positions4);
   maCache1 = await loadMAs(MA_KEY1);
   maCache2 = await loadMAs(MA_KEY2);
   maCache3 = await loadMAs(MA_KEY3);
-  // Seed test MA so yellow color is visible in sandbox before live fetch
+  maCache4 = await loadMAs(MA_KEY4);
   if (!maCache1['COST'] || !maCache1['COST'].ma50) {
     maCache1['COST'] = { ma50: 950.00, ma100: 880.00, ma200: 800.00 };
   }
@@ -772,6 +687,7 @@ function downloadHTML() {
   await fetchAll();
   await fetchAll2();
   await fetchAll3();
+  await fetchAll4();
 })();
 </script>
 </body>
